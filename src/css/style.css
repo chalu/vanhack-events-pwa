@@ -1,0 +1,632 @@
+/* Start CSS Rests 
+   reset the browser's default styles ============= */
+
+*,::after,::before{box-sizing:border-box}ol[class],ul[class]{padding:0}blockquote,body,dd,dl,figcaption,figure,h1,h2,h3,h4,li,ol[class],p,ul[class]{margin:0}body{min-height:100vh;scroll-behavior:smooth;text-rendering:optimizeSpeed;line-height:1.5}ol[class],ul[class]{list-style:none}a:not([class]){text-decoration-skip-ink:auto}img{max-width:100%;display:block}article>*+*{margin-top:1em}button,input,select,textarea{font:inherit}@media (prefers-reduced-motion:reduce){*{animation-duration:0s!important;animation-iteration-count:1!important;transition-duration:0s!important;scroll-behavior:auto!important}}
+
+/* End CSS Rests ============= */
+
+/* Main app CSS */
+
+body {
+  background: #f7f9fb;
+}
+
+[viewport] {
+  display: grid;
+  grid-template-rows: 50px auto 50px;
+  grid-row-gap: 1em;
+}
+
+.ribbon {
+  position: absolute;
+  left: -5px;
+  top: -5px;
+  z-index: 1;
+  overflow: hidden;
+  width: 75px;
+  height: 75px;
+  text-align: right;
+  z-index: 10;
+}
+
+.ribbon span {
+  font-size: 10px;
+  font-weight: bold;
+  color: #fff;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 20px;
+  transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+  width: 100px;
+  display: block;
+  background: #79a70a;
+  background: linear-gradient(#f70505 0%, #8f0808 100%);
+  box-shadow: 0 3px 10px -5px rgba(0, 0, 0, 1);
+  position: absolute;
+  top: 19px;
+  left: -21px;
+}
+
+.ribbon span::before {
+  content: "";
+  position: absolute;
+  left: 0px;
+  top: 100%;
+  z-index: -1;
+  border-left: 3px solid #8f0808;
+  border-right: 3px solid transparent;
+  border-bottom: 3px solid transparent;
+  border-top: 3px solid #8f0808;
+}
+
+.ribbon span::after {
+  content: "";
+  position: absolute;
+  right: 0px;
+  top: 100%;
+  z-index: -1;
+  border-left: 3px solid transparent;
+  border-right: 3px solid #8f0808;
+  border-bottom: 3px solid transparent;
+  border-top: 3px solid #8f0808;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #ccc;
+}
+
+header nav {
+  display: flex;
+  width: 170px;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+header [profile] {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  margin-right: 1em;
+}
+
+header nav a {
+  color: #333;
+  font-family: "Roboto", sans-serif;
+  text-decoration: none;
+}
+
+header [profile] img {
+  display: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 1px 1px 4px #bdbdbd;
+}
+
+header [profile] img:hover {
+  box-shadow: 2px 2px 4px #bdbdbd;
+}
+
+header [profile][authenticated] a {
+  display: none;
+  visibility: hidden;
+}
+
+header [profile][authenticated] img {
+  display: block;
+}
+
+main {
+  padding: 0;
+  min-height: calc(100vh - 135px);
+}
+
+main [hero-display] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  margin: 0 3.5em;
+}
+
+main [hero-image-wrap] {
+  width: 400px;
+  height: 400px;
+  background: #e5f4ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin-bottom: 3em;
+}
+
+main [hero-image-wrap] svg {
+  width: 65%;
+  height: 65%;
+  object-fit: contain;
+}
+
+main [hero-display] h2 {
+  margin: 0 2em;
+  font-family: "Roboto", sans-serif;
+  font-weight: 100;
+  font-size: xx-large;
+}
+
+main [hero-display] h2 span {
+  background: #127aca;
+  padding: 0.2em;
+  border-radius: 10px;
+  color: #f1f1f1;
+  font-weight: 300;
+}
+
+main [promoted-events] {
+  margin: 0 3.5em;
+  min-height: 350px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+}
+
+main [promoted-events] [events],
+main [promoted-events] [testimonial] {
+  min-height: 300px;
+}
+
+main [promoted-events] [events] {
+  flex: 2;
+  display: flex;
+  justify-content: space-evenly;
+}
+
+main [promoted-events] [testimonial] {
+  flex: 1;
+}
+
+[testimonial] blockquote {
+  background: #fff;
+  padding: 2em;
+  margin: 1.5em 10px;
+  text-align: justify;
+  quotes: "\201C""\201D""\2018""\2019";
+  font-family: "Roboto", sans-serif;
+}
+
+[testimonial] blockquote:before {
+  color: #ccc;
+  content: open-quote;
+  font-size: 4em;
+  line-height: 0.1em;
+  margin-right: 0.25em;
+  vertical-align: -0.4em;
+}
+
+[testimonial] blockquote p {
+  text-align: right;
+  margin-top: 0.5em;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+[testimonial] blockquote img {
+  border-radius: 50%;
+}
+
+[upcoming-events] [events] > div,
+[promoted-events] [events] > div,
+[more-events-wrap] [events] > div {
+  display: flex;
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  align-items: flex-end;
+  box-shadow: 1px 1px 4px #000;
+}
+
+[events] [summary] a {
+  color: #333;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+[events] [summary] a:hover {
+  border-bottom: 1px solid #127aca;
+}
+
+[promoted-events] [events] > div {
+  height: 238px;
+  margin: 1.5em 1em;
+  background: #fff;
+}
+
+[upcoming-events] [events] > div {
+  margin: 0.5em;
+  background: #f1f1f1;
+  flex: none;
+  width: 31%;
+  height: 205px;
+}
+
+[more-events-wrap] [events] > div {
+  background: #fff;
+  margin: 1.5em 10px;
+  /* width: 243px; */
+  width: 23%;
+  flex: none;
+}
+
+main [upcoming-events] {
+  background: #e5f4ff;
+  padding: 3em 3.5em;
+  border-bottom: 2px solid;
+}
+
+main [upcoming-events] h2,
+main [more-events-wrap] h2 {
+  color: #000;
+  font-family: "Roboto", sans-serif;
+  font-size: x-large;
+}
+
+main [upcoming-events] [events] {
+  min-height: 350px;
+  display: flex;
+  flex-flow: wrap;
+}
+
+main [events-wrap] .badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 45px;
+  height: 50px;
+  background: #fff;
+  border-bottom-left-radius: 50%;
+  border: 1px dashed;
+  opacity: 0.75;
+  display: grid;
+  place-items: center;
+  font-family: "Roboto", sans-serif;
+  font-weight: bold;
+  font-size: x-large;
+  color: red;
+  z-index: 10;
+}
+
+[upcoming-events] [events] > div:hover {
+  background: #fff;
+}
+
+main [events-wrap] nav {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 5px;
+}
+
+main [events-wrap] nav a {
+  color: #ccc;
+}
+
+main [events-wrap] nav a:hover {
+  color: #fff;
+}
+
+main [events-wrap] nav a .material-icons {
+  font-size: 36px;
+}
+
+main [more-events-wrap][events-wrap] a {
+  color: #333;
+}
+
+main [more-events-wrap][events-wrap] a:hover {
+  color: #000;
+}
+
+main [more-events-wrap] {
+  padding: 3em 3.5em;
+}
+
+main [more-events-wrap] [events] {
+  display: flex;
+  flex-flow: wrap;
+  min-height: 401px;
+  justify-content: space-around;
+}
+
+[upcoming-events] [events] img,
+[promoted-events] [events] img,
+[more-events-wrap] [events] img {
+  width: 100%;
+  object-fit: cover;
+  object-position: center;
+  position: absolute;
+}
+
+[events-wrap] [events] [summary] {
+  color: #333;
+  background: #fff;
+  z-index: 1;
+  opacity: 0.9;
+  padding: 0.3em;
+  text-align: center;
+  width: 100%;
+  font-family: "Roboto", sans-serif;
+}
+
+[more-events-wrap] [summary] {
+  margin-top: 0.25em;
+  padding-top: 1em;
+}
+
+[events] [summary] h2 {
+  color: #333;
+  margin-bottom: 0.5em;
+}
+
+[more-events-wrap] [summary] h2 {
+  transform: scale(0.85);
+}
+
+[events] [summary] [dates] {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+[summary] [dates] p,
+[summary] [dates] button {
+  display: flex;
+  align-items: flex-end;
+}
+
+[summary] [dates] span {
+  color: #127aca;
+  font-weight: bold;
+}
+
+main dialog {
+  position: fixed;
+  font-family: "Roboto", sans-serif;
+}
+
+[interactive].event-held [share],
+[interactive].event-held [apply-btn],
+[interactive].event-held [apply-deadline] {
+  display: none;
+}
+
+main dialog,
+main dialog[open]::backdrop {
+  opacity: 0;
+  visibility: hidden;
+  transition: visibility 0s linear 0.5s, opacity 5s linear;
+}
+
+main dialog[open].in,
+main dialog[open].in::backdrop {
+  transition-delay: 0s;
+}
+
+main dialog[open].in,
+main dialog[open].in::backdrop {
+  opacity: 1;
+  visibility: visible;
+}
+
+dialog[notice] {
+  top: 2em;
+  left: -65%;
+  z-index: 10;
+  border: none;
+  background: #000;
+  padding: 0.5em 1em;
+  min-width: 200px;
+  text-align: center;
+}
+
+dialog[notice] [title] {
+  margin: 0;
+  border: none;
+  color: #fff;
+}
+
+dialog[notice] a {
+  color: #f1f1f1;
+  font-family: "Rotobo", sans-serif;
+}
+
+dialog[notice] a:hover {
+  color: #fff;
+  text-decoration: none;
+}
+
+dialog menu {
+  padding: 0;
+  display: flex;
+  margin-top: 1.5em;
+  align-items: center;
+  justify-content: space-between;
+}
+
+dialog menu button {
+  padding-left: 1em;
+  padding-right: 1em;
+}
+
+main dialog [title],
+main dialog [about] {
+  margin-bottom: 1em;
+}
+
+main dialog [title] {
+  border-bottom: 1px solid #ccc;
+}
+
+main [auth-dialog] {
+  min-width: 300px;
+  max-width: 500px;
+  top: calc(100vh / 2 - 120px);
+}
+
+main [auth-dialog] label {
+  display: block;
+}
+
+main [auth-dialog] label + label {
+  margin-top: 1em;
+}
+
+main [event-details-dialog] {
+  position: fixed;
+  top: 0;
+  right: -60%;
+  bottom: 0;
+  height: 100vh;
+  width: 40%;
+  border: none;
+  border-left: 5px solid #127aca;
+}
+
+main [event-details-dialog] [title] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.25em;
+}
+
+[event-details-dialog] [title] span {
+  text-transform: capitalize;
+}
+
+[event-details-dialog] [title] aside {
+  display: flex;
+  justify-content: flex-end;
+}
+
+[title] aside [type],
+[title] aside [entry] {
+  display: inline-block;
+  padding: 0 0.5em;
+  background: bisque;
+  margin-right: 0.3em;
+}
+
+[title] aside [entry] {
+  background: aqua;
+}
+
+[event-details-dialog] p {
+  margin-top: 1em;
+}
+
+[event-details-dialog] [details] {
+  position: relative;
+}
+
+[event-details-dialog] [details] img {
+  min-width: 437px;
+  min-height: 330px;
+  height: auto;
+}
+
+[event-details-dialog] [details] p {
+  margin: 0.25em;
+  position: absolute;
+  bottom: 0;
+  padding: 0.5em;
+  background: #fff;
+  opacity: 0.8;
+}
+
+[event-details-dialog] [date],
+[event-details-dialog] [apply-deadline] {
+  font-weight: bold;
+}
+
+[event-details-dialog] [share] {
+  display: flex;
+  padding: 0 1em;
+  min-width: 230px;
+  justify-content: space-between;
+}
+
+[event-details-dialog] menu {
+  justify-content: flex-start;
+}
+
+[event-details-dialog] menu button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.1em 1em;
+  min-width: 155px;
+}
+
+[event-details-dialog] menu button.close {
+  padding: 0.1em;
+  min-width: auto;
+  padding-right: 0.25em;
+}
+
+[event-details-dialog] menu button:last-child {
+  margin-left: 1em;
+  min-width: 180px;
+}
+
+main dialog::backdrop {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+main [premium-info] {
+  min-height: 300px;
+  position: relative;
+  border-bottom: 2px dotted #ccc;
+}
+
+main [premium-info] aside {
+  position: absolute;
+  top: 3em;
+  right: 3em;
+  width: 50%;
+  height: 350px;
+  background: brown;
+  opacity: 0.85;
+  padding: 2em;
+  color: #f1f1f1;
+  font-family: "Roboto";
+}
+
+[premium-info] aside h2,
+[premium-info] aside h3,
+[premium-info] aside p {
+  margin: 1em;
+}
+
+[premium-info] aside a {
+  background: #000;
+  padding: 0.5em 1em;
+  text-decoration: none;
+  color: #f1f1f1;
+  margin-top: 1em;
+  display: inline-block;
+}
+
+[premium-info] aside a:hover {
+  color: #fff;
+}
+
+footer {
+  height: 60px;
+  background: #000;
+  padding: 0 3.5em;
+}
