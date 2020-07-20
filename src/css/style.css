@@ -146,7 +146,7 @@ main [hero-image-wrap] {
   margin-bottom: 3em;
 }
 
-main [hero-image-wrap] svg {
+main [hero-image-wrap] img {
   width: 65%;
   height: 65%;
   object-fit: contain;
