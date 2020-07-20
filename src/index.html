@@ -8,31 +8,355 @@
       content="A modern single page web app implementation for VanHack events. Hope you like it. Contact @chaluwa on Twitter for feedback"
     />
 
+    <title>Events - VanHack Platform</title>
+
     <link
       href="data:image/x-icon;base64,AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAQAABILAAASCwAAAAAAAAAAAADMdwxbzXYI3c11B/7NdQf/zXUH/811B//NdQf/zXUH/811B//NdQf/zXUH/811B//NdQf/zXUH/s12CN3MdwxbzXYI3M51Bv/OdQX/zXMC/81zAf/OdAP/znUG/851Bv/OdAX/zXMC/81zAv/OdAT/znUG/851Bv/OdQb/zXYI3M11B/3OdQX/z3kN/92gVP/hq2f/2JI7/851Bf/OdAX/0oEc/+CnYP/hqmX/144z/850Bf/OdQb/znUG/811B/3NdQf/zXMD/9qYRf/89/H///////HXt//PeQ3/znQD/9SHJv/57d///////+3Mo//Odgj/znUG/851Bv/NdQf/zXUH/852CP/syp7////////////68eX/1oos/81zA//Pdwr/79Ku///////36tj/04Mf/850BP/OdQb/zXUH/810BP/XjzX/+vLn//////////////79/+CnYf/NcgD/zHAA/+KubP///////vv4/9ydTf/NcwL/znUG/811B//NcwP/5LN2///////////////////////syZ7/1481/+GqZf/ov4z//vz5///////ov4v/znQE/851Bv/NdQf/zXMD/+CnX///////+vHl//bn1P//////9ubR/+Oxc//+/Pr/////////////////9N/F/9F8E//OdQX/zXUH/810BP/XjTL/+/Xt/+i+iv/ksnT///////359P/jr2//+Ora//369f/++/f///////z17v/YkTj/zXMD/811B//NdQb/0X4W/+7Qq//Wiy7/2JA4//z27///////6L6L/9ePNP/ZlD3/4q5u//369///////47Fx/81zAv/NdQf/zXUH/893Cf/XjTH/znYI/9F9FP/04Mf///////Pdwf/Qeg//zXIA/9KBHP/36df//////+/Tr//PeAv/zXUH/811B//OdQb/znQF/851Bv/OdAT/6cCN///////79Oz/1481/81zA//Odgf/7cyi///////57uD/1Icn/810Bf/NdQf/znUG/851Bv/OdQb/zXMC/92eUP/++/j//////+Kubf/NcwL/zXMC/+CpZP///v7//v37/96jWf/NcwP/zXUH/c51Bv/OdQb/znUG/850Bf/RfRX/36Vc/+GqZv/Ykzv/znUF/850Bf/SgRz/4Kdg/+GpZf/XjjL/zXQG/c12CNzOdQb/znUG/851Bv/OdQb/znUF/81zAv/NcwL/znQE/851Bv/OdQb/znQF/81zAv/NcwL/znQE/812CNzMdwxbzXYI3c11B/7NdQf/zXUH/811B//NdQf/zXUH/811B//NdQf/zXUH/811B//NdQf/zXUH/s12CN3MdwxbAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=="
       rel="icon"
       type="image/x-icon"
     />
 
-    <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,700;1,100&display=swap"
-      rel="stylesheet"
-    />
+    <style>
+      /* Inline-ed Roboto font from https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,700;1,100&display=swap */
+      @font-face {
+        font-family: Roboto;
+        font-style: italic;
+        font-weight: 100;
+        font-display: swap;
+        src: local('Roboto Thin Italic'), local('Roboto-ThinItalic'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOiCnqEu92Fr1Mu51QrEz0dL-vwnYh2eg.woff2) format('woff2');
+        unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: italic;
+        font-weight: 100;
+        font-display: swap;
+        src: local('Roboto Thin Italic'), local('Roboto-ThinItalic'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOiCnqEu92Fr1Mu51QrEzQdL-vwnYh2eg.woff2) format('woff2');
+        unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: italic;
+        font-weight: 100;
+        font-display: swap;
+        src: local('Roboto Thin Italic'), local('Roboto-ThinItalic'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOiCnqEu92Fr1Mu51QrEzwdL-vwnYh2eg.woff2) format('woff2');
+        unicode-range: U+1F00-1FFF;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: italic;
+        font-weight: 100;
+        font-display: swap;
+        src: local('Roboto Thin Italic'), local('Roboto-ThinItalic'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOiCnqEu92Fr1Mu51QrEzMdL-vwnYh2eg.woff2) format('woff2');
+        unicode-range: U+0370-03FF;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: italic;
+        font-weight: 100;
+        font-display: swap;
+        src: local('Roboto Thin Italic'), local('Roboto-ThinItalic'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOiCnqEu92Fr1Mu51QrEz8dL-vwnYh2eg.woff2) format('woff2');
+        unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: italic;
+        font-weight: 100;
+        font-display: swap;
+        src: local('Roboto Thin Italic'), local('Roboto-ThinItalic'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOiCnqEu92Fr1Mu51QrEz4dL-vwnYh2eg.woff2) format('woff2');
+        unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F,
+          U+A720-A7FF;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: italic;
+        font-weight: 100;
+        font-display: swap;
+        src: local('Roboto Thin Italic'), local('Roboto-ThinItalic'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOiCnqEu92Fr1Mu51QrEzAdL-vwnYg.woff2) format('woff2');
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074,
+          U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: 100;
+        font-display: swap;
+        src: local('Roboto Thin'), local('Roboto-Thin'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOkCnqEu92Fr1MmgVxFIzIXKMnyrYk.woff2) format('woff2');
+        unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: 100;
+        font-display: swap;
+        src: local('Roboto Thin'), local('Roboto-Thin'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOkCnqEu92Fr1MmgVxMIzIXKMnyrYk.woff2) format('woff2');
+        unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: 100;
+        font-display: swap;
+        src: local('Roboto Thin'), local('Roboto-Thin'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOkCnqEu92Fr1MmgVxEIzIXKMnyrYk.woff2) format('woff2');
+        unicode-range: U+1F00-1FFF;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: 100;
+        font-display: swap;
+        src: local('Roboto Thin'), local('Roboto-Thin'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOkCnqEu92Fr1MmgVxLIzIXKMnyrYk.woff2) format('woff2');
+        unicode-range: U+0370-03FF;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: 100;
+        font-display: swap;
+        src: local('Roboto Thin'), local('Roboto-Thin'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOkCnqEu92Fr1MmgVxHIzIXKMnyrYk.woff2) format('woff2');
+        unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: 100;
+        font-display: swap;
+        src: local('Roboto Thin'), local('Roboto-Thin'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOkCnqEu92Fr1MmgVxGIzIXKMnyrYk.woff2) format('woff2');
+        unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F,
+          U+A720-A7FF;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: 100;
+        font-display: swap;
+        src: local('Roboto Thin'), local('Roboto-Thin'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOkCnqEu92Fr1MmgVxIIzIXKMny.woff2) format('woff2');
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074,
+          U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: 300;
+        font-display: swap;
+        src: local('Roboto Light'), local('Roboto-Light'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOlCnqEu92Fr1MmSU5fCRc4AMP6lbBP.woff2) format('woff2');
+        unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: 300;
+        font-display: swap;
+        src: local('Roboto Light'), local('Roboto-Light'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOlCnqEu92Fr1MmSU5fABc4AMP6lbBP.woff2) format('woff2');
+        unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: 300;
+        font-display: swap;
+        src: local('Roboto Light'), local('Roboto-Light'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOlCnqEu92Fr1MmSU5fCBc4AMP6lbBP.woff2) format('woff2');
+        unicode-range: U+1F00-1FFF;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: 300;
+        font-display: swap;
+        src: local('Roboto Light'), local('Roboto-Light'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOlCnqEu92Fr1MmSU5fBxc4AMP6lbBP.woff2) format('woff2');
+        unicode-range: U+0370-03FF;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: 300;
+        font-display: swap;
+        src: local('Roboto Light'), local('Roboto-Light'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOlCnqEu92Fr1MmSU5fCxc4AMP6lbBP.woff2) format('woff2');
+        unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: 300;
+        font-display: swap;
+        src: local('Roboto Light'), local('Roboto-Light'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOlCnqEu92Fr1MmSU5fChc4AMP6lbBP.woff2) format('woff2');
+        unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F,
+          U+A720-A7FF;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: 300;
+        font-display: swap;
+        src: local('Roboto Light'), local('Roboto-Light'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOlCnqEu92Fr1MmSU5fBBc4AMP6lQ.woff2) format('woff2');
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074,
+          U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: local('Roboto'), local('Roboto-Regular'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOmCnqEu92Fr1Mu72xKKTU1Kvnz.woff2) format('woff2');
+        unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: local('Roboto'), local('Roboto-Regular'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOmCnqEu92Fr1Mu5mxKKTU1Kvnz.woff2) format('woff2');
+        unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: local('Roboto'), local('Roboto-Regular'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOmCnqEu92Fr1Mu7mxKKTU1Kvnz.woff2) format('woff2');
+        unicode-range: U+1F00-1FFF;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: local('Roboto'), local('Roboto-Regular'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOmCnqEu92Fr1Mu4WxKKTU1Kvnz.woff2) format('woff2');
+        unicode-range: U+0370-03FF;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: local('Roboto'), local('Roboto-Regular'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOmCnqEu92Fr1Mu7WxKKTU1Kvnz.woff2) format('woff2');
+        unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: local('Roboto'), local('Roboto-Regular'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOmCnqEu92Fr1Mu7GxKKTU1Kvnz.woff2) format('woff2');
+        unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F,
+          U+A720-A7FF;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: local('Roboto'), local('Roboto-Regular'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOmCnqEu92Fr1Mu4mxKKTU1Kg.woff2) format('woff2');
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074,
+          U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: 700;
+        font-display: swap;
+        src: local('Roboto Bold'), local('Roboto-Bold'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOlCnqEu92Fr1MmWUlfCRc4AMP6lbBP.woff2) format('woff2');
+        unicode-range: U+0460-052F, U+1C80-1C88, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: 700;
+        font-display: swap;
+        src: local('Roboto Bold'), local('Roboto-Bold'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOlCnqEu92Fr1MmWUlfABc4AMP6lbBP.woff2) format('woff2');
+        unicode-range: U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: 700;
+        font-display: swap;
+        src: local('Roboto Bold'), local('Roboto-Bold'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOlCnqEu92Fr1MmWUlfCBc4AMP6lbBP.woff2) format('woff2');
+        unicode-range: U+1F00-1FFF;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: 700;
+        font-display: swap;
+        src: local('Roboto Bold'), local('Roboto-Bold'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOlCnqEu92Fr1MmWUlfBxc4AMP6lbBP.woff2) format('woff2');
+        unicode-range: U+0370-03FF;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: 700;
+        font-display: swap;
+        src: local('Roboto Bold'), local('Roboto-Bold'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOlCnqEu92Fr1MmWUlfCxc4AMP6lbBP.woff2) format('woff2');
+        unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9, U+20AB;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: 700;
+        font-display: swap;
+        src: local('Roboto Bold'), local('Roboto-Bold'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOlCnqEu92Fr1MmWUlfChc4AMP6lbBP.woff2) format('woff2');
+        unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F,
+          U+A720-A7FF;
+      }
+      @font-face {
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: 700;
+        font-display: swap;
+        src: local('Roboto Bold'), local('Roboto-Bold'),
+          url(https://fonts.gstatic.com/s/roboto/v20/KFOlCnqEu92Fr1MmWUlfBBc4AMP6lQ.woff2) format('woff2');
+        unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074,
+          U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+      }
+    </style>
 
     <style>
       /* Inline-ed "Material+Icons&display=block" Google font */
       @font-face {
-        font-family: "Material Icons";
+        font-family: 'Material Icons';
         font-style: normal;
         font-weight: 400;
         font-display: block;
-        src: url(https://fonts.gstatic.com/s/materialicons/v53/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2)
-          format("woff2");
+        src: url(https://fonts.gstatic.com/s/materialicons/v53/flUhRq6tzZclQEJ-Vdg-IuiaDsNcIhQ8tQ.woff2) format('woff2');
       }
-
       .material-icons {
-        font-family: "Material Icons";
-        font-weight: normal;
+        font-family: 'Material Icons';
+        font-weight: 400;
         font-style: normal;
         font-size: 24px;
         line-height: 1;
@@ -42,12 +366,11 @@
         white-space: nowrap;
         word-wrap: normal;
         direction: ltr;
-        -webkit-font-feature-settings: "liga";
+        -webkit-font-feature-settings: 'liga';
         -webkit-font-smoothing: antialiased;
       }
     </style>
 
-    <title>Events - VanHack Platform</title>
     <link rel="stylesheet" href="./css/style.css" />
 
     <link rel="preconnect" href="//cdn.filestackcontent.com" crossorigin />
@@ -58,13 +381,7 @@
     <div viewport>
       <header>
         <a href="/">
-          <img
-            logo
-            src="images/vanhack-logo-blue.svg"
-            alt="VanHack Events"
-            width="130px"
-            height="50px"
-          />
+          <img logo src="images/vanhack-logo-blue.svg" alt="VanHack Events" width="130px" height="50px" />
         </a>
         <nav>
           <a href="#premium-info">Premium</a>
@@ -83,7 +400,7 @@
       <main>
         <div hero-display>
           <div hero-image-wrap>
-            <img src="./images/black-men-office-video-chat.webp" alt="HanHack Events Illustration" >
+            <img src="./images/black-men-office-video-chat.webp" alt="HanHack Events Illustration" />
           </div>
           <div hero-text-wrap>
             <h2>
@@ -97,13 +414,13 @@
         <div promoted-events events-wrap>
           <div testimonial>
             <blockquote>
-              All their tips were very valuable. The engagement made a huge
-              difference in my success. It was the best decision ever!
+              All their tips were very valuable. The engagement made a huge difference in my success. It was the best
+              decision ever!
 
               <p>
                 <img src="https://i.pravatar.cc/36?img=26" alt="VanHack user" />
                 <span>
-                  --- Anita Odili, Nigeria
+                  &nbsp; --- Anita Odili, Nigeria
                 </span>
               </p>
             </blockquote>
@@ -125,18 +442,14 @@
         </div>
 
         <div premium-info id="premium-info">
-          <img
-            alt="VanHack Premium"
-            loading="lazy"
-            src="./images/vanhack-premium.webp" />
+          <img alt="VanHack Premium" loading="lazy" src="./images/vanhack-premium.webp" />
 
           <aside>
             <h3>VanHack Premium</h3>
             <h2>Get Ready To Get Hired Abroad, Fast!</h2>
             <p>
-              Acquire career skills that will make you stand out from the herd!
-              Live interview practice, profile review, exclusive webinars and
-              more
+              Acquire career skills that will make you stand out from the herd! Live interview practice, profile review,
+              exclusive webinars and more
             </p>
             <p>
               <a href="https://vanhack.com/premium" target="_blank">
@@ -167,8 +480,7 @@
         <dialog interactive auth-dialog>
           <h3 title>Sign In</h3>
           <p about>
-            Enable one-click event application, and see which events you already
-            applied for
+            Enable one-click event application, and see which events you already applied for
           </p>
 
           <form method="dialog">
@@ -229,14 +541,7 @@
       </main>
 
       <footer>
-        <img
-          logo
-          width="178px"
-          height="38px"
-          alt="VanHack logo"
-          loading="lazy"
-          src="./images/vanhack-logo-black.svg"
-        />
+        <img logo width="178px" height="38px" alt="VanHack logo" loading="lazy" src="./images/vanhack-logo-black.svg" />
       </footer>
     </div>
 
