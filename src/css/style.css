@@ -152,6 +152,10 @@ main [hero-image-wrap] svg {
   object-fit: contain;
 }
 
+main [hero-text-wrap] {
+  min-width: 495px;
+}
+
 main [hero-display] h2 {
   margin: 0 2em;
   font-family: "Roboto", sans-serif;
@@ -181,18 +185,21 @@ main [promoted-events] [testimonial] {
   min-height: 300px;
 }
 
+main [promoted-events] [testimonial] {
+  flex: 1;
+  min-width: 355px;
+}
+
 main [promoted-events] [events] {
   flex: 2;
   display: flex;
   justify-content: space-evenly;
-}
-
-main [promoted-events] [testimonial] {
-  flex: 1;
+  min-width: 700px;
 }
 
 [testimonial] blockquote {
-  background: #fff;
+  background: #127aca;
+  color: #f1f1f1;
   padding: 2em;
   margin: 1.5em 10px;
   text-align: justify;
@@ -224,32 +231,29 @@ main [promoted-events] [testimonial] {
 [upcoming-events] [events] > div,
 [promoted-events] [events] > div,
 [more-events-wrap] [events] > div {
-  display: flex;
   flex: 1;
+  display: flex;
+  align-items: flex-end;
   position: relative;
   overflow: hidden;
-  align-items: flex-end;
   box-shadow: 1px 1px 4px #000;
 }
 
 [events] [summary] a {
   color: #333;
   text-decoration: none;
-  border-bottom: 1px solid transparent;
-}
-
-[events] [summary] a:hover {
-  border-bottom: 1px solid #127aca;
+  font-weight: 300;
 }
 
 [promoted-events] [events] > div {
   height: 238px;
+  max-width: 50%;
   margin: 1.5em 1em;
   background: #fff;
 }
 
 [upcoming-events] [events] > div {
-  margin: 0.5em;
+  margin: 1.5em 0.5em;
   background: #f1f1f1;
   flex: none;
   width: 31%;
@@ -346,10 +350,11 @@ main [more-events-wrap] [events] {
 [upcoming-events] [events] img,
 [promoted-events] [events] img,
 [more-events-wrap] [events] img {
+  top: 0;
   width: 100%;
+  position: absolute;
   object-fit: cover;
   object-position: center;
-  position: absolute;
 }
 
 [events-wrap] [events] [summary] {
@@ -370,7 +375,7 @@ main [more-events-wrap] [events] {
 
 [events] [summary] h2 {
   color: #333;
-  margin-bottom: 0.5em;
+  margin: 0.5em 0;
 }
 
 [more-events-wrap] [summary] h2 {
@@ -381,6 +386,7 @@ main [more-events-wrap] [events] {
   display: flex;
   align-items: center;
   justify-content: space-evenly;
+  margin-bottom: 1em;
 }
 
 [summary] [dates] p,
