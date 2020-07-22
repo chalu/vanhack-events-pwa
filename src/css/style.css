@@ -1,6 +1,5 @@
-/* Start CSS Rests 
+/* Start CSS Resets 
    reset the browser's default styles ============= */
-
 *,
 ::after,
 ::before {
@@ -79,7 +78,6 @@ body {
   position: absolute;
   left: -5px;
   top: -5px;
-  z-index: 1;
   overflow: hidden;
   width: 75px;
   height: 75px;
@@ -109,7 +107,7 @@ body {
 .ribbon span::before {
   content: '';
   position: absolute;
-  left: 0px;
+  left: 0;
   top: 100%;
   z-index: -1;
   border-left: 3px solid #8f0808;
@@ -121,7 +119,7 @@ body {
 .ribbon span::after {
   content: '';
   position: absolute;
-  right: 0px;
+  right: 0;
   top: 100%;
   z-index: -1;
   border-left: 3px solid transparent;
@@ -265,7 +263,7 @@ main [promoted-events] [events] {
   font-family: 'Roboto', sans-serif;
 }
 
-[testimonial] blockquote:before {
+[testimonial] blockquote::before {
   color: #ccc;
   content: open-quote;
   font-size: 4em;
@@ -473,13 +471,9 @@ main dialog[open]::backdrop {
 
 main dialog[open].in,
 main dialog[open].in::backdrop {
-  transition-delay: 0s;
-}
-
-main dialog[open].in,
-main dialog[open].in::backdrop {
   opacity: 1;
   visibility: visible;
+  transition-delay: 0s;
 }
 
 dialog[notice] {
@@ -662,7 +656,7 @@ main [premium-info] aside {
   opacity: 0.85;
   padding: 2em;
   color: #f1f1f1;
-  font-family: 'Roboto';
+  font-family: 'Roboto', sans-serif;
 }
 
 [premium-info] aside h2,
