@@ -60,44 +60,80 @@ const dateTimeFormat = new Intl.DateTimeFormat('default', {
   second: 'numeric',
   timeZoneName: 'short'
 });
-const rAF = () => new Promise((resolve) => window.requestAnimationFrame(resolve));
+const rAF = ({ waitUntil } = {}) =>
+  new Promise((resolve) => {
+    if (waitUntil) {
+      setTimeout(() => {
+        window.requestAnimationFrame(resolve);
+      }, waitUntil);
+    } else {
+      window.requestAnimationFrame(resolve);
+    }
+  });
 
-const notify = (msg, duration = 5000) => {
+const displayDialog = async (dialog, isNotice = false) => {
+  if (!dialog) return;
+
+  await rAF();
+  if (isNotice === true) {
+    dialog.show();
+  } else {
+    dialog.showModal();
+  }
+
+  await rAF({ waitUntil: 500 });
+  dialog.classList.add('in');
+};
+
+const notify = async (msg, duration = 5000) => {
   const dialog = select('dialog[notice]');
   dialog.querySelector('[title]').innerHTML = msg;
-  dialog.classList.add('in');
-  dialog.show();
-  setTimeout(
-    () =>
-      rAF().then(() => {
-        dialog.classList.remove('in');
-        dialog.close();
-      }),
-    duration
-  );
+  displayDialog(dialog, true);
+
+  await rAF({ waitUntil: duration });
+  dialog.classList.remove('in');
+  dialog.close();
 };
 
 const getRoute = () => (window.location.hash || '#').substring(1);
 const hasActiveRoute = () => getRoute() !== '';
+
+const displayBanner = (img, url) => {
+  rAF().then(() => {
+    img.classList.add('on');
+    img.src = url;
+  });
+};
+
+const loadBanner = (url) =>
+  new Promise((resolve, reject) => {
+    const loader = new Image();
+    loader.addEventListener('error', reject);
+    loader.addEventListener('load', () => resolve(loader, url));
+    loader.src = url;
+  });
 
 const showEventDetails = (eventId) => {
   const event = STATE.events.find(({ id }) => id === eventId);
   if (!event) return;
 
   const dialog = select('[event-details-dialog]');
-  const { id, title, type, entry, about, banner, when, applyDeadline } = event;
+  const { id, title, type, entry, about, banner, preview, when, applyDeadline } = event;
 
   if (id !== dialog.dataset.uid) {
     dialog.setAttribute('data-uid', id);
     dialog.querySelector('[title-txt]').textContent = title;
     dialog.querySelector('[type]').textContent = type;
     dialog.querySelector('[entry]').textContent = entry;
-    dialog.querySelector('img').src = banner;
     dialog.querySelector('[about]').textContent = about;
     dialog.querySelector('[date]').textContent = `Date: ${dateFormat.format(new Date(when))}`;
     dialog.querySelector('[apply-deadline]').textContent = `Apply Before: ${dateTimeFormat.format(
       new Date(applyDeadline)
     )}`;
+
+    const img = dialog.querySelector('img');
+    img.src = preview;
+    loadBanner(banner).then(() => displayBanner(img, banner));
   }
 
   const now = Date.now();
@@ -108,16 +144,15 @@ const showEventDetails = (eventId) => {
 
   if (dialog.hasAttribute('open')) return;
 
-  dialog.classList.add('in');
-  dialog.showModal();
+  displayDialog(dialog);
 };
 
 const routeApp = () => {
   const route = getRoute();
   if (route === 'auth') {
+    if (STATE.user && STATE.user.isAuthenticated === true) return;
     const dialog = select('[auth-dialog]');
-    dialog.classList.add('in');
-    dialog.showModal();
+    displayDialog(dialog);
   }
 
   if (route.startsWith('event-')) {
@@ -274,7 +309,7 @@ const eventDomTemplate = (event) => {
   const { id, title, type, entry, banner, preview, when, applyDeadline } = event;
 
   let badge = '';
-  const ribbon = entry === 'Premium' ? `<div class="ribbon"><span>${entry}</span></div>` : '';
+  const ribbon = entry === 'Premium' ? `<div class="ribbon-premium"><span>${entry}</span></div>` : '';
   if (['Leap', 'Recruiting Mission', 'VanHackathon'].includes(type)) {
     let typeTxt;
     if (type === 'Recruiting Mission') {
@@ -320,20 +355,15 @@ const makeEventForDisplay = (event, view) => {
 };
 
 const lazyLoadEventBannersFor = (...selectors) => {
-  const banners = selectors.reduce((pool, query) => {
-    const imgs = [...selectAll(query)];
-    pool.push(...imgs);
+  const banners = selectors.reduce((pool, imgs) => {
+    pool.push(...selectAll(imgs));
     return pool;
   }, []);
 
-  banners.forEach((img) => {
-    const loader = new Image();
-    loader.onload = () => {
-      rAF().then(() => {
-        img.src = img.dataset.src;
-      });
-    };
-    loader.src = img.dataset.src;
+  banners.forEach((image) => {
+    const img = image;
+    const url = img.dataset.src;
+    loadBanner(url).then(() => displayBanner(img, url));
   });
 };
 
@@ -419,12 +449,14 @@ const signUserIn = () => {
   queue.put(() => saveUserState(STATE.user));
 
   rAF().then(() => {
-    const profile = select('[profile');
-    const avatar = profile.querySelector('img');
+    const nav = select('header nav');
+    const avatar = nav.querySelector('[profile] img');
+    avatar.onload = () => {
+      nav.setAttribute('authenticated', '');
+    };
     avatar.src = `https://api.adorable.io/avatars/36/${email}.png`;
     avatar.setAttribute('alt', email);
     avatar.setAttribute('title', email);
-    profile.setAttribute('authenticated', '');
   });
 
   queue.put(() => {
@@ -447,10 +479,18 @@ const signUserIn = () => {
 };
 
 const setupUI = () => {
+  window.onpopstate = () => routeApp();
   selectAll('dialog[interactive]').forEach((dialog) => {
-    if (dialog.hasAttribute('event-details-dialog')) {
-      dialog.addEventListener('click', userWillEngageEventDetails);
-    }
+    dialog.addEventListener('click', ({ target }) => {
+      if (target.tagName === 'DIALOG') {
+        dialog.close();
+        return;
+      }
+
+      if (dialog.hasAttribute('event-details-dialog')) {
+        dialog.addEventListener('click', userWillEngageEventDetails);
+      }
+    });
 
     dialog.addEventListener('close', () => {
       dialog.classList.remove('in', 'event-held');
@@ -458,7 +498,6 @@ const setupUI = () => {
     });
     dialog.querySelector('.close').addEventListener('click', () => dialog.close());
   });
-  window.onpopstate = () => routeApp();
 };
 
 const setupAuth = () => {
