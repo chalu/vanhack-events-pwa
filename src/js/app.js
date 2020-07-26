@@ -129,9 +129,9 @@ const showEventDetails = (eventId) => {
     dialog.querySelector('[entry]').textContent = entry;
     dialog.querySelector('[about]').textContent = about;
     dialog.querySelector('[date]').textContent = `Date: ${dateFormat.format(new Date(when))}`;
-    dialog.querySelector('[apply-deadline]').textContent = `Apply Before: ${dateTimeFormat.format(
-      new Date(applyDeadline)
-    )}`;
+
+    const deadline = dateTimeFormat.format(new Date(applyDeadline));
+    dialog.querySelector('[apply-deadline]').textContent = `Apply Before: ${deadline}`;
 
     const img = dialog.querySelector('img');
     img.src = preview;
