@@ -60,8 +60,7 @@ const dateTimeFormat = new Intl.DateTimeFormat('default', {
   second: 'numeric',
   timeZoneName: 'short'
 });
-const rAF = ({ waitUntil } = {}) =>
-  new Promise((resolve) => {
+const rAF = ({ waitUntil } = {}) => new Promise((resolve) => {
     if (waitUntil) {
       setTimeout(() => {
         window.requestAnimationFrame(resolve);
@@ -105,8 +104,7 @@ const displayBanner = (img, url) => {
   });
 };
 
-const loadBanner = (url) =>
-  new Promise((resolve, reject) => {
+const loadBanner = (url) => new Promise((resolve, reject) => {
     const loader = new Image();
     loader.addEventListener('error', reject);
     loader.addEventListener('load', () => resolve(loader, url));
@@ -118,7 +116,9 @@ const showEventDetails = (eventId) => {
   if (!event) return;
 
   const dialog = select('[event-details-dialog]');
-  const { id, title, type, entry, about, banner, preview, when, applyDeadline } = event;
+  const {
+    id, title, type, entry, about, banner, preview, when, applyDeadline
+  } = event;
 
   if (id !== dialog.dataset.uid) {
     dialog.setAttribute('data-uid', id);
@@ -127,9 +127,9 @@ const showEventDetails = (eventId) => {
     dialog.querySelector('[entry]').textContent = entry;
     dialog.querySelector('[about]').textContent = about;
     dialog.querySelector('[date]').textContent = `Date: ${dateFormat.format(new Date(when))}`;
-    dialog.querySelector('[apply-deadline]').textContent = `Apply Before: ${dateTimeFormat.format(
-      new Date(applyDeadline)
-    )}`;
+
+    const deadline = dateTimeFormat.format(new Date(applyDeadline));
+    dialog.querySelector('[apply-deadline]').textContent = `Apply Before: ${deadline}`;
 
     const img = dialog.querySelector('img');
     img.src = preview;
@@ -177,8 +177,7 @@ const responseCanErr = (response) => {
   return response;
 };
 
-const fetchEvents = (dimension = '') =>
-  new Promise((resolve) => {
+const fetchEvents = (dimension = '') => new Promise((resolve) => {
     const api = '4k91l7py';
     const apiKey = 'LEIX-GF3O-AG7I-6J84';
     const apiBase = 'https://randomapi.com/api';
@@ -196,7 +195,9 @@ const fetchEvents = (dimension = '') =>
           resolve(events);
         });
       })
-      .catch((error) => console.log(error));
+      .catch(() => {
+        notify('Error loading events. Pls retry');
+      });
   });
 
 const sortEventsByStartDate = (dir = 'ASC') => (a, b) => {
@@ -213,8 +214,7 @@ const saveUserState = (update = {}) => {
   STATE.user = data[email];
 };
 
-const isDuplicateApplication = (eventId) =>
-  new Promise((resolve) => {
+const isDuplicateApplication = (eventId) => new Promise((resolve) => {
     queue.put(() => {
       const { email } = STATE.user;
       const data = JSON.parse(localStorage.getItem('vanhackevents') || '{}');
@@ -223,15 +223,14 @@ const isDuplicateApplication = (eventId) =>
     });
   });
 
-const applyToEvent = (eventId) =>
-  new Promise((resolve) => {
+const applyToEvent = (eventId) => new Promise((resolve) => {
     queue.put(() => {
       let applied = false;
       const event = STATE.events.find(({ id }) => id === eventId);
       if (!event) return resolve(applied);
 
       if (event.entry === 'Premium' && !STATE.user.isPremium) {
-        notify('you are not eligible. activate <a href="#premium-info">Premium</a> to apply');
+        notify('You are not eligible. Activate <a href="#premium-info">premium</a> to apply');
         return resolve(applied);
       }
 
@@ -306,7 +305,9 @@ const userWillEngageEventDetails = ({ target }) => {
 };
 
 const eventDomTemplate = (event) => {
-  const { id, title, type, entry, banner, preview, when, applyDeadline } = event;
+  const {
+    id, title, type, entry, banner, preview, when, applyDeadline
+  } = event;
 
   let badge = '';
   const ribbon = entry === 'Premium' ? `<div class="ribbon-premium"><span>${entry}</span></div>` : '';
