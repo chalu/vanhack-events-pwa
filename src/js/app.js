@@ -60,8 +60,7 @@ const dateTimeFormat = new Intl.DateTimeFormat('default', {
   second: 'numeric',
   timeZoneName: 'short'
 });
-const rAF = ({ waitUntil } = {}) =>
-  new Promise((resolve) => {
+const rAF = ({ waitUntil } = {}) => new Promise((resolve) => {
     if (waitUntil) {
       setTimeout(() => {
         window.requestAnimationFrame(resolve);
@@ -105,8 +104,7 @@ const displayBanner = (img, url) => {
   });
 };
 
-const loadBanner = (url) =>
-  new Promise((resolve, reject) => {
+const loadBanner = (url) => new Promise((resolve, reject) => {
     const loader = new Image();
     loader.addEventListener('error', reject);
     loader.addEventListener('load', () => resolve(loader, url));
@@ -179,8 +177,7 @@ const responseCanErr = (response) => {
   return response;
 };
 
-const fetchEvents = (dimension = '') =>
-  new Promise((resolve) => {
+const fetchEvents = (dimension = '') => new Promise((resolve) => {
     const api = '4k91l7py';
     const apiKey = 'LEIX-GF3O-AG7I-6J84';
     const apiBase = 'https://randomapi.com/api';
@@ -217,8 +214,7 @@ const saveUserState = (update = {}) => {
   STATE.user = data[email];
 };
 
-const isDuplicateApplication = (eventId) =>
-  new Promise((resolve) => {
+const isDuplicateApplication = (eventId) => new Promise((resolve) => {
     queue.put(() => {
       const { email } = STATE.user;
       const data = JSON.parse(localStorage.getItem('vanhackevents') || '{}');
@@ -227,8 +223,7 @@ const isDuplicateApplication = (eventId) =>
     });
   });
 
-const applyToEvent = (eventId) =>
-  new Promise((resolve) => {
+const applyToEvent = (eventId) => new Promise((resolve) => {
     queue.put(() => {
       let applied = false;
       const event = STATE.events.find(({ id }) => id === eventId);
