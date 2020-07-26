@@ -120,8 +120,9 @@ const showEventDetails = (eventId) => {
     id, title, type, entry, about, banner, preview, when, applyDeadline
   } = event;
 
-  if (id !== dialog.dataset.uid) {
+  if (!dialog.dataset.uid || id !== dialog.dataset.uid) {
     dialog.setAttribute('data-uid', id);
+    dialog.querySelector('h3').setAttribute('title', '');
     dialog.querySelector('[title-txt]').textContent = title;
     dialog.querySelector('[type]').textContent = type;
     dialog.querySelector('[entry]').textContent = entry;

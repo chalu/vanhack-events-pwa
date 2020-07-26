@@ -483,7 +483,7 @@ main [auth-dialog] label + label {
 
 main [event-details-dialog] {
   will-change: width;
-  transition: width 3s ease-in, height 3s ease-in;
+  transition: width 1.5s ease-in;
 }
 
 main [event-details-dialog] [title] {
