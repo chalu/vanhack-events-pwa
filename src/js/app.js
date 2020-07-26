@@ -118,7 +118,9 @@ const showEventDetails = (eventId) => {
   if (!event) return;
 
   const dialog = select('[event-details-dialog]');
-  const { id, title, type, entry, about, banner, preview, when, applyDeadline } = event;
+  const {
+    id, title, type, entry, about, banner, preview, when, applyDeadline
+  } = event;
 
   if (id !== dialog.dataset.uid) {
     dialog.setAttribute('data-uid', id);
@@ -196,7 +198,9 @@ const fetchEvents = (dimension = '') =>
           resolve(events);
         });
       })
-      .catch((error) => console.log(error));
+      .catch(() => {
+        notify('Error loading events. Pls retry');
+      });
   });
 
 const sortEventsByStartDate = (dir = 'ASC') => (a, b) => {
@@ -231,7 +235,7 @@ const applyToEvent = (eventId) =>
       if (!event) return resolve(applied);
 
       if (event.entry === 'Premium' && !STATE.user.isPremium) {
-        notify('you are not eligible. activate <a href="#premium-info">Premium</a> to apply');
+        notify('You are not eligible. Activate <a href="#premium-info">premium</a> to apply');
         return resolve(applied);
       }
 
@@ -306,7 +310,9 @@ const userWillEngageEventDetails = ({ target }) => {
 };
 
 const eventDomTemplate = (event) => {
-  const { id, title, type, entry, banner, preview, when, applyDeadline } = event;
+  const {
+    id, title, type, entry, banner, preview, when, applyDeadline
+  } = event;
 
   let badge = '';
   const ribbon = entry === 'Premium' ? `<div class="ribbon-premium"><span>${entry}</span></div>` : '';
