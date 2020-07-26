@@ -22,7 +22,7 @@ class TaskQueue {
 
       while (this.canRun(deadline)) {
         const task = this.queue.shift();
-        await task();
+        task();
       }
 
       this.isRunning = false;
@@ -60,25 +60,124 @@ const dateTimeFormat = new Intl.DateTimeFormat('default', {
   second: 'numeric',
   timeZoneName: 'short'
 });
-const rAF = () => new Promise((resolve) => window.requestAnimationFrame(resolve));
+const rAF = ({ waitUntil } = {}) => new Promise((resolve) => {
+    if (waitUntil) {
+      setTimeout(() => {
+        window.requestAnimationFrame(resolve);
+      }, waitUntil);
+    } else {
+      window.requestAnimationFrame(resolve);
+    }
+  });
 
-const notify = (msg, duration = 5000) => {
-  const dialog = select('dialog[notice]');
-  dialog.querySelector('[title]').innerHTML = msg;
+const displayDialog = async (dialog, isNotice = false) => {
+  if (!dialog) return;
+
+  await rAF();
+  if (isNotice === true) {
+    dialog.show();
+  } else {
+    dialog.showModal();
+  }
+
+  await rAF({ waitUntil: 500 });
   dialog.classList.add('in');
-  dialog.show();
-  setTimeout(
-    () =>
-      rAF().then(() => {
-        dialog.classList.remove('in');
-        dialog.close();
-      }),
-    duration
-  );
 };
 
-const fetchEvents = (dimension = '') =>
-  new Promise(async (resolve) => {
+const notify = async (msg, duration = 5000) => {
+  const dialog = select('dialog[notice]');
+  dialog.querySelector('[title]').innerHTML = msg;
+  displayDialog(dialog, true);
+
+  await rAF({ waitUntil: duration });
+  dialog.classList.remove('in');
+  dialog.close();
+};
+
+const getRoute = () => (window.location.hash || '#').substring(1);
+const hasActiveRoute = () => getRoute() !== '';
+
+const displayBanner = (img, url) => {
+  rAF().then(() => {
+    img.classList.add('on');
+    img.src = url;
+  });
+};
+
+const loadBanner = (url) => new Promise((resolve, reject) => {
+    const loader = new Image();
+    loader.addEventListener('error', reject);
+    loader.addEventListener('load', () => resolve(loader, url));
+    loader.src = url;
+  });
+
+const showEventDetails = (eventId) => {
+  const event = STATE.events.find(({ id }) => id === eventId);
+  if (!event) return;
+
+  const dialog = select('[event-details-dialog]');
+  const {
+    id, title, type, entry, about, banner, preview, when, applyDeadline
+  } = event;
+
+  if (id !== dialog.dataset.uid) {
+    dialog.setAttribute('data-uid', id);
+    dialog.querySelector('[title-txt]').textContent = title;
+    dialog.querySelector('[type]').textContent = type;
+    dialog.querySelector('[entry]').textContent = entry;
+    dialog.querySelector('[about]').textContent = about;
+    dialog.querySelector('[date]').textContent = `Date: ${dateFormat.format(new Date(when))}`;
+
+    const deadline = dateTimeFormat.format(new Date(applyDeadline));
+    dialog.querySelector('[apply-deadline]').textContent = `Apply Before: ${deadline}`;
+
+    const img = dialog.querySelector('img');
+    img.src = preview;
+    loadBanner(banner).then(() => displayBanner(img, banner));
+  }
+
+  const now = Date.now();
+  const isPastEvent = now > new Date(when).getTime();
+  if (isPastEvent) {
+    dialog.classList.add('event-held');
+  }
+
+  if (dialog.hasAttribute('open')) return;
+
+  displayDialog(dialog);
+};
+
+const routeApp = () => {
+  const route = getRoute();
+  if (route === 'auth') {
+    if (STATE.user && STATE.user.isAuthenticated === true) return;
+    const dialog = select('[auth-dialog]');
+    displayDialog(dialog);
+  }
+
+  if (route.startsWith('event-')) {
+    const id = route.substring(route.indexOf('-') + 1);
+    showEventDetails(id);
+  }
+
+  if (route === 'premium-info') {
+    select('#premium-info').scrollTo({
+      behavior: 'smooth'
+    });
+  }
+
+  const openDialog = select('dialog[open]');
+  if (route === '' && openDialog) {
+    openDialog.close();
+  }
+};
+
+const responseCanErr = (response) => {
+  if (!response.ok) throw Error(`fetch failed with status : (${response.status})`);
+  return response;
+};
+
+const fetchEvents = (dimension = '') => new Promise((resolve) => {
     const api = '4k91l7py';
     const apiKey = 'LEIX-GF3O-AG7I-6J84';
     const apiBase = 'https://randomapi.com/api';
@@ -86,27 +185,25 @@ const fetchEvents = (dimension = '') =>
     let request = `${apiBase}/${api}?key=${apiKey}`;
     if (dimension && dimension !== '') request = `${request}&dimension=${dimension}`;
 
-    try {
-      const response = await fetch(request);
-      if (!response.ok) throw Error(`fetch failed with status : (${response.status})`);
-
-      queue.put(async () => {
-        const {
-          results: [{ events }]
-        } = await response.json();
-        resolve(events);
+    fetch(request)
+      .then(responseCanErr)
+      .then((response) => {
+        queue.put(async () => {
+          const {
+            results: [{ events }]
+          } = await response.json();
+          resolve(events);
+        });
+      })
+      .catch(() => {
+        notify('Error loading events. Pls retry');
       });
-    } catch (error) {
-      console.log(error);
-    }
   });
 
-const sortEventsByStartDate = (dir = 'ASC') => {
-  return (a, b) => {
-    const elapsedA = new Date(a.when).getTime();
-    const elapsedB = new Date(b.when).getTime();
-    return dir === 'ASC' ? elapsedA - elapsedB : elapsedB - elapsedA;
-  };
+const sortEventsByStartDate = (dir = 'ASC') => (a, b) => {
+  const elapsedA = new Date(a.when).getTime();
+  const elapsedB = new Date(b.when).getTime();
+  return dir === 'ASC' ? elapsedA - elapsedB : elapsedB - elapsedA;
 };
 
 const saveUserState = (update = {}) => {
@@ -117,8 +214,7 @@ const saveUserState = (update = {}) => {
   STATE.user = data[email];
 };
 
-const isDuplicateApplication = (eventId) =>
-  new Promise((resolve) => {
+const isDuplicateApplication = (eventId) => new Promise((resolve) => {
     queue.put(() => {
       const { email } = STATE.user;
       const data = JSON.parse(localStorage.getItem('vanhackevents') || '{}');
@@ -127,15 +223,14 @@ const isDuplicateApplication = (eventId) =>
     });
   });
 
-const applyToEvent = (eventId) =>
-  new Promise((resolve) => {
+const applyToEvent = (eventId) => new Promise((resolve) => {
     queue.put(() => {
       let applied = false;
       const event = STATE.events.find(({ id }) => id === eventId);
       if (!event) return resolve(applied);
 
       if (event.entry === 'Premium' && !STATE.user.isPremium) {
-        notify('you are not eligible. activate <a href="#premium-info">Premium</a> to apply');
+        notify('You are not eligible. Activate <a href="#premium-info">premium</a> to apply');
         return resolve(applied);
       }
 
@@ -144,21 +239,21 @@ const applyToEvent = (eventId) =>
       STATE.user.events.push(eventId);
       saveUserState(STATE.user);
       applied = true;
-      resolve(applied);
+      return resolve(applied);
     });
   });
 
 const handleShareEvent = () => {
-  const deepLink = `${location.href}`;
+  const deepLink = `${window.location.href}`;
   const text = 'Check out this @GoVanHack event that helps techies make the most of job opportunities:';
-  let url = `https://twitter.com/intent/tweet?text=${text}&url=${deepLink}`;
+  const url = `https://twitter.com/intent/tweet?text=${text}&url=${deepLink}`;
   window.open(url, '', 'resizable,width=650,height=370');
 };
 
 const handleApplyToEvent = async (eventId, btn) => {
   const { user } = STATE;
   if (!user || !user.isAuthenticated) {
-    history.pushState(null, null, '#auth');
+    window.history.pushState(null, null, '#auth');
     routeApp();
     return;
   }
@@ -177,10 +272,15 @@ const handleApplyToEvent = async (eventId, btn) => {
       // the above button might be from within the modal
       // make sure the apply button on the event listing
       // is updated to reflect that the user has applied for the event
-      const eventNode = [...selectAll(`[events] > div`)].find((el) => el.dataset.uid === eventId);
-      const relatedCTA = eventNode.querySelector('[apply-btn] [call-to-action]');
-      if (relatedCTA) {
-        relatedCTA.textContent = 'You Applied';
+
+      // const eventNode = [...selectAll(`[events] > div`)]
+      // .find((el) => el.dataset.uid === eventId);
+      const eventNode = select(`[events] [uid=${eventId}]`);
+      if (eventNode) {
+        const relatedCTA = eventNode.querySelector('[apply-btn] [call-to-action]');
+        if (relatedCTA) {
+          relatedCTA.textContent = 'You Applied';
+        }
       }
 
       notify('you have successfully applied');
@@ -204,23 +304,13 @@ const userWillEngageEventDetails = ({ target }) => {
   }
 };
 
-const moreEventsFetcher = new IntersectionObserver(async (entries) => {
-  const triggerView = entries.find((e) => e.isIntersecting === true);
-  if (triggerView) {
-    moreEventsFetcher.unobserve(select('footer'));
-    moreEventsFetcher.unobserve(select('[upcoming-events]'));
-    scheduledMoreEventsFetch = false;
-
-    const moreEvents = await fetchEvents();
-    await handleRemainingEvents(moreEvents);
-  }
-});
-
 const eventDomTemplate = (event) => {
-  const { id, title, type, entry, banner, preview, when, applyDeadline } = event;
+  const {
+    id, title, type, entry, banner, preview, when, applyDeadline
+  } = event;
 
   let badge = '';
-  const ribbon = entry === 'Premium' ? `<div class="ribbon"><span>${entry}</span></div>` : ``;
+  const ribbon = entry === 'Premium' ? `<div class="ribbon-premium"><span>${entry}</span></div>` : '';
   if (['Leap', 'Recruiting Mission', 'VanHackathon'].includes(type)) {
     let typeTxt;
     if (type === 'Recruiting Mission') {
@@ -236,7 +326,7 @@ const eventDomTemplate = (event) => {
   const deadline = new Date(applyDeadline).getTime();
   const canApply = deadline > now;
   const applyBtn = canApply
-    ? `<button apply-btn><span class="material-icons">perm_contact_calendar</span><span call-to-action>Login To Apply</span></button>`
+    ? '<button apply-btn><span class="material-icons">perm_contact_calendar</span><span call-to-action>Login To Apply</span></button>'
     : '';
 
   const tpl = `
@@ -266,26 +356,21 @@ const makeEventForDisplay = (event, view) => {
 };
 
 const lazyLoadEventBannersFor = (...selectors) => {
-  const banners = selectors.reduce((pool, query) => {
-    const imgs = [...selectAll(query)];
-    pool.push(...imgs);
+  const banners = selectors.reduce((pool, imgs) => {
+    pool.push(...selectAll(imgs));
     return pool;
   }, []);
 
-  banners.forEach((img) => {
-    const loader = new Image();
-    loader.onload = () => {
-      rAF().then(() => {
-        img.src = img.dataset.src;
-      });
-    };
-    loader.src = img.dataset.src;
+  banners.forEach((image) => {
+    const img = image;
+    const url = img.dataset.src;
+    loadBanner(url).then(() => displayBanner(img, url));
   });
 };
 
 const displayEvents = (containerSelector, events) => {
   const container = select(containerSelector);
-  let fragmeent = document.createDocumentFragment();
+  const fragmeent = document.createDocumentFragment();
   events.forEach((evt) => makeEventForDisplay(evt, fragmeent));
   container.innerHTML = '';
   container.appendChild(fragmeent);
@@ -310,6 +395,26 @@ const displayRemainingEvents = (events) => {
   });
 };
 
+const handleRemainingEvents = async (events) => {
+  queue.put(() => {
+    const sorted = events.sort(sortEventsByStartDate('DSC'));
+    displayRemainingEvents(sorted);
+    sorted.forEach((evt) => STATE.events.push(evt));
+  });
+};
+
+const moreEventsFetcher = new IntersectionObserver(async (entries) => {
+  const triggerView = entries.find((e) => e.isIntersecting === true);
+  if (triggerView) {
+    moreEventsFetcher.unobserve(select('footer'));
+    moreEventsFetcher.unobserve(select('[upcoming-events]'));
+    scheduledMoreEventsFetch = false;
+
+    const moreEvents = await fetchEvents();
+    await handleRemainingEvents(moreEvents);
+  }
+});
+
 const handleHeroEvents = async (events) => {
   queue.put(() => {
     const sorted = events.sort(sortEventsByStartDate('ASC'));
@@ -326,20 +431,12 @@ const handleHeroEvents = async (events) => {
   });
 };
 
-const handleRemainingEvents = async (events) => {
-  queue.put(() => {
-    const sorted = events.sort(sortEventsByStartDate('DSC'));
-    displayRemainingEvents(sorted);
-    sorted.forEach((evt) => STATE.events.push(evt));
-  });
-};
-
 const signUserIn = () => {
   const emailInput = select('[auth-dialog] [type=email]');
   const email = emailInput.value;
 
   // TODO provide better email validation
-  if (!email || `${email}`.trim() == '' || email.indexOf('@') === -1) {
+  if (!email || `${email}`.trim() === '' || email.indexOf('@') === -1) {
     notify('to login, pls enter email with a valid format');
     return;
   }
@@ -353,12 +450,14 @@ const signUserIn = () => {
   queue.put(() => saveUserState(STATE.user));
 
   rAF().then(() => {
-    const profile = select('[profile');
-    const avatar = profile.querySelector('img');
+    const nav = select('header nav');
+    const avatar = nav.querySelector('[profile] img');
+    avatar.onload = () => {
+      nav.setAttribute('authenticated', '');
+    };
     avatar.src = `https://api.adorable.io/avatars/36/${email}.png`;
     avatar.setAttribute('alt', email);
     avatar.setAttribute('title', email);
-    profile.setAttribute('authenticated', '');
   });
 
   queue.put(() => {
@@ -381,83 +480,30 @@ const signUserIn = () => {
 };
 
 const setupUI = () => {
+  window.onpopstate = () => routeApp();
   selectAll('dialog[interactive]').forEach((dialog) => {
-    if (dialog.hasAttribute('event-details-dialog')) {
-      dialog.addEventListener('click', userWillEngageEventDetails);
-    }
+    dialog.addEventListener('click', ({ target }) => {
+      if (target.tagName === 'DIALOG') {
+        dialog.close();
+        return;
+      }
+
+      if (dialog.hasAttribute('event-details-dialog')) {
+        dialog.addEventListener('click', userWillEngageEventDetails);
+      }
+    });
 
     dialog.addEventListener('close', () => {
       dialog.classList.remove('in', 'event-held');
-      history.back();
+      window.history.back();
     });
     dialog.querySelector('.close').addEventListener('click', () => dialog.close());
   });
-  window.onpopstate = () => routeApp();
 };
 
 const setupAuth = () => {
   const loginBtn = select('[auth-dialog] [login]');
   loginBtn.addEventListener('click', signUserIn);
-};
-
-const getRoute = () => (location.hash || '#').substring(1);
-const hasActiveRoute = () => getRoute() !== '';
-
-const showEventDetails = (eventId) => {
-  const event = STATE.events.find(({ id }) => id === eventId);
-  if (!event) return;
-
-  const dialog = select('[event-details-dialog]');
-  const { id, title, type, entry, about, banner, when, applyDeadline } = event;
-
-  if (id !== dialog.dataset.uid) {
-    dialog.setAttribute('data-uid', id);
-    dialog.querySelector('[title-txt]').textContent = title;
-    dialog.querySelector('[type]').textContent = type;
-    dialog.querySelector('[entry]').textContent = entry;
-    dialog.querySelector('img').src = banner;
-    dialog.querySelector('[about]').textContent = about;
-    dialog.querySelector('[date]').textContent = `Date: ${dateFormat.format(new Date(when))}`;
-    dialog.querySelector('[apply-deadline]').textContent = `Apply Before: ${dateTimeFormat.format(
-      new Date(applyDeadline)
-    )}`;
-  }
-
-  const now = Date.now();
-  const isPastEvent = now > new Date(when).getTime();
-  if (isPastEvent) {
-    dialog.classList.add('event-held');
-  }
-
-  if (dialog.hasAttribute('open')) return;
-
-  dialog.classList.add('in');
-  dialog.showModal();
-};
-
-const routeApp = () => {
-  const route = getRoute();
-  if (route === 'auth') {
-    const dialog = select('[auth-dialog]');
-    dialog.classList.add('in');
-    dialog.showModal();
-  }
-
-  if (route.startsWith('event-')) {
-    const id = route.substring(route.indexOf('-') + 1);
-    showEventDetails(id);
-  }
-
-  if (route === 'premium-info') {
-    select('#premium-info').scrollTo({
-      behavior: 'smooth'
-    });
-  }
-
-  const openDialog = select('dialog[open]');
-  if (route === '' && openDialog) {
-    openDialog.close();
-  }
 };
 
 const startApp = async () => {

@@ -1,6 +1,6 @@
 # VanHack Events PWA
 
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/641f0592a1af467dbe765c2e0f7eb036)](https://www.codacy.com/manual/chalu/vanhack-events-pwa?utm_source=github.com&utm_medium=referral&utm_content=chalu/vanhack-events-pwa&utm_campaign=Badge_Grade)
+[![CodeFactor](https://www.codefactor.io/repository/github/chalu/vanhack-events-pwa/badge)](https://www.codefactor.io/repository/github/chalu/vanhack-events-pwa)
 
 [See It Live Here](https://vanhack-events-pwa.netlify.app/)
 
