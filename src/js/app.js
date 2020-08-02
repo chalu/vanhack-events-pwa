@@ -1,10 +1,12 @@
 import {
   rAF, select, selectAll, dateFormat, dateTimeFormat,
-  displayDialog, hasActiveRoute, getRoute, responseCanErr
+  displayDialog, hasActiveRoute, getRoute, responseCanErr,
+  loadBanner, displayBanner
 } from './ui-utils';
-import useQueue from './queue';
 
-const STATE = {};
+import useQueue from './queue';
+import { STATE, saveUserState } from './state';
+
 const domParser = new DOMParser();
 let scheduledMoreEventsFetch = false;
 
@@ -20,57 +22,6 @@ const notify = async (msg, duration = 5000) => {
   dialog.close();
 };
 
-const displayBanner = (img, url) => {
-  rAF().then(() => {
-    img.classList.add('on');
-    img.src = url;
-  });
-};
-
-const loadBanner = (url) => new Promise((resolve, reject) => {
-  const loader = new Image();
-  loader.addEventListener('error', reject);
-  loader.addEventListener('load', () => resolve(loader, url));
-  loader.src = url;
-});
-
-const showEventDetails = (eventId) => {
-  const event = STATE.events.find(({ id }) => id === eventId);
-  if (!event) return;
-
-  const dialog = select('[event-details-dialog]');
-  const {
-    id, title, type, entry, about, banner, preview, when, applyDeadline
-  } = event;
-
-  if (!dialog.dataset.uid || id !== dialog.dataset.uid) {
-    dialog.setAttribute('data-uid', id);
-    dialog.querySelector('h3').setAttribute('title', '');
-    dialog.querySelector('[title-txt]').textContent = title;
-    dialog.querySelector('[type]').textContent = type;
-    dialog.querySelector('[entry]').textContent = entry;
-    dialog.querySelector('[about]').textContent = about;
-    dialog.querySelector('[date]').textContent = `Date: ${dateFormat.format(new Date(when))}`;
-
-    const deadline = dateTimeFormat.format(new Date(applyDeadline));
-    dialog.querySelector('[apply-deadline]').textContent = `Apply Before: ${deadline}`;
-
-    const img = dialog.querySelector('img');
-    img.src = preview;
-    loadBanner(banner).then(() => displayBanner(img, banner));
-  }
-
-  const now = Date.now();
-  const isPastEvent = now > new Date(when).getTime();
-  if (isPastEvent) {
-    dialog.classList.add('event-held');
-  }
-
-  if (dialog.hasAttribute('open')) return;
-
-  displayDialog(dialog);
-};
-
 const routeApp = () => {
   const route = getRoute();
   if (route === 'auth') {
@@ -81,7 +32,10 @@ const routeApp = () => {
 
   if (route.startsWith('event-')) {
     const id = route.substring(route.indexOf('-') + 1);
-    showEventDetails(id);
+    import('./show-events-details.js').then((module) => {
+      const showEventDetails = module.default;
+      showEventDetails(id);
+    });
   }
 
   if (route === 'premium-info') {
@@ -116,14 +70,6 @@ const sortEventsByStartDate = (dir = 'ASC') => (a, b) => {
   const elapsedA = new Date(a.when).getTime();
   const elapsedB = new Date(b.when).getTime();
   return dir === 'ASC' ? elapsedA - elapsedB : elapsedB - elapsedA;
-};
-
-const saveUserState = (update = {}) => {
-  const { email } = STATE.user;
-  const data = JSON.parse(localStorage.getItem('vanhackevents') || '{}');
-  data[email] = Object.assign(data[email] || {}, update);
-  localStorage.setItem('vanhackevents', JSON.stringify(data));
-  STATE.user = data[email];
 };
 
 const isDuplicateApplication = (eventId) => new Promise((resolve) => {

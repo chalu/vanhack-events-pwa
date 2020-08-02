@@ -54,6 +54,20 @@ export const displayDialog = async (dialog, isNotice = false) => {
   dialog.classList.add('in');
 };
 
+export const displayBanner = (img, url) => {
+  rAF().then(() => {
+    img.classList.add('on');
+    img.src = url;
+  });
+};
+
+export const loadBanner = (url) => new Promise((resolve, reject) => {
+  const loader = new Image();
+  loader.addEventListener('error', reject);
+  loader.addEventListener('load', () => resolve(loader, url));
+  loader.src = url;
+});
+
 export const getRoute = () => (window.location.hash || '#').substring(1);
 export const hasActiveRoute = () => getRoute() !== '';
 
