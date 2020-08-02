@@ -1,88 +1,16 @@
-class TaskQueue {
-  constructor({ minRunTime = 0 } = {}) {
-    this.queue = [];
-    this.isRunning = false;
-    this.runLimit = minRunTime;
+import {
+  rAF, select, selectAll, dateFormat, dateTimeFormat,
+  displayDialog, hasActiveRoute, getRoute, responseCanErr,
+  loadBanner, displayBanner
+} from './ui-utils';
 
-    this.run = this.run.bind(this);
-  }
+import useQueue from './queue';
+import { STATE, saveUserState } from './state';
 
-  put(...tasks) {
-    this.queue.push(...tasks);
-    this.scheduleRun();
-  }
-
-  hasPending() {
-    return this.queue.length >= 1;
-  }
-
-  async run(deadline) {
-    if (!this.isRunning) {
-      this.isRunning = true;
-
-      while (this.canRun(deadline)) {
-        const task = this.queue.shift();
-        task();
-      }
-
-      this.isRunning = false;
-      if (this.hasPending()) this.scheduleRun();
-    }
-  }
-
-  canRun(deadline) {
-    return this.hasPending() && deadline.timeRemaining() > this.runLimit;
-  }
-
-  scheduleRun() {
-    if (!this.isRunning) requestIdleCallback(this.run);
-  }
-}
-
-const STATE = {};
-const queue = new TaskQueue();
 const domParser = new DOMParser();
-
 let scheduledMoreEventsFetch = false;
-const select = document.querySelector.bind(document);
-const selectAll = document.querySelectorAll.bind(document);
-const dateFormat = new Intl.DateTimeFormat('default', {
-  month: 'short',
-  day: '2-digit',
-  year: 'numeric'
-});
-const dateTimeFormat = new Intl.DateTimeFormat('default', {
-  month: 'short',
-  day: '2-digit',
-  year: 'numeric',
-  hour: 'numeric',
-  minute: 'numeric',
-  second: 'numeric',
-  timeZoneName: 'short'
-});
-const rAF = ({ waitUntil } = {}) => new Promise((resolve) => {
-    if (waitUntil) {
-      setTimeout(() => {
-        window.requestAnimationFrame(resolve);
-      }, waitUntil);
-    } else {
-      window.requestAnimationFrame(resolve);
-    }
-  });
 
-const displayDialog = async (dialog, isNotice = false) => {
-  if (!dialog) return;
-
-  await rAF();
-  if (isNotice === true) {
-    dialog.show();
-  } else {
-    dialog.showModal();
-  }
-
-  await rAF({ waitUntil: 500 });
-  dialog.classList.add('in');
-};
+const [queue, chain] = useQueue();
 
 const notify = async (msg, duration = 5000) => {
   const dialog = select('dialog[notice]');
@@ -92,60 +20,6 @@ const notify = async (msg, duration = 5000) => {
   await rAF({ waitUntil: duration });
   dialog.classList.remove('in');
   dialog.close();
-};
-
-const getRoute = () => (window.location.hash || '#').substring(1);
-const hasActiveRoute = () => getRoute() !== '';
-
-const displayBanner = (img, url) => {
-  rAF().then(() => {
-    img.classList.add('on');
-    img.src = url;
-  });
-};
-
-const loadBanner = (url) => new Promise((resolve, reject) => {
-    const loader = new Image();
-    loader.addEventListener('error', reject);
-    loader.addEventListener('load', () => resolve(loader, url));
-    loader.src = url;
-  });
-
-const showEventDetails = (eventId) => {
-  const event = STATE.events.find(({ id }) => id === eventId);
-  if (!event) return;
-
-  const dialog = select('[event-details-dialog]');
-  const {
-    id, title, type, entry, about, banner, preview, when, applyDeadline
-  } = event;
-
-  if (!dialog.dataset.uid || id !== dialog.dataset.uid) {
-    dialog.setAttribute('data-uid', id);
-    dialog.querySelector('h3').setAttribute('title', '');
-    dialog.querySelector('[title-txt]').textContent = title;
-    dialog.querySelector('[type]').textContent = type;
-    dialog.querySelector('[entry]').textContent = entry;
-    dialog.querySelector('[about]').textContent = about;
-    dialog.querySelector('[date]').textContent = `Date: ${dateFormat.format(new Date(when))}`;
-
-    const deadline = dateTimeFormat.format(new Date(applyDeadline));
-    dialog.querySelector('[apply-deadline]').textContent = `Apply Before: ${deadline}`;
-
-    const img = dialog.querySelector('img');
-    img.src = preview;
-    loadBanner(banner).then(() => displayBanner(img, banner));
-  }
-
-  const now = Date.now();
-  const isPastEvent = now > new Date(when).getTime();
-  if (isPastEvent) {
-    dialog.classList.add('event-held');
-  }
-
-  if (dialog.hasAttribute('open')) return;
-
-  displayDialog(dialog);
 };
 
 const routeApp = () => {
@@ -158,7 +32,10 @@ const routeApp = () => {
 
   if (route.startsWith('event-')) {
     const id = route.substring(route.indexOf('-') + 1);
-    showEventDetails(id);
+    import('./show-events-details.js').then((module) => {
+      const showEventDetails = module.default;
+      showEventDetails(id);
+    });
   }
 
   if (route === 'premium-info') {
@@ -173,33 +50,21 @@ const routeApp = () => {
   }
 };
 
-const responseCanErr = (response) => {
-  if (!response.ok) throw Error(`fetch failed with status : (${response.status})`);
-  return response;
-};
-
 const fetchEvents = (dimension = '') => new Promise((resolve) => {
-    const api = '4k91l7py';
-    const apiKey = 'LEIX-GF3O-AG7I-6J84';
-    const apiBase = 'https://randomapi.com/api';
+  const api = '4k91l7py';
+  const apiKey = 'LEIX-GF3O-AG7I-6J84';
+  const apiBase = 'https://randomapi.com/api';
 
-    let request = `${apiBase}/${api}?key=${apiKey}`;
-    if (dimension && dimension !== '') request = `${request}&dimension=${dimension}`;
+  let request = `${apiBase}/${api}?key=${apiKey}`;
+  if (dimension && dimension !== '') request = `${request}&dimension=${dimension}`;
 
-    fetch(request)
-      .then(responseCanErr)
-      .then((response) => {
-        queue.put(async () => {
-          const {
-            results: [{ events }]
-          } = await response.json();
-          resolve(events);
-        });
-      })
-      .catch(() => {
-        notify('Error loading events. Pls retry');
-      });
-  });
+  fetch(request)
+    .then(responseCanErr)
+    .then((response) => resolve(response))
+    .catch(() => {
+      notify('Error loading events. Pls retry');
+    });
+});
 
 const sortEventsByStartDate = (dir = 'ASC') => (a, b) => {
   const elapsedA = new Date(a.when).getTime();
@@ -207,42 +72,34 @@ const sortEventsByStartDate = (dir = 'ASC') => (a, b) => {
   return dir === 'ASC' ? elapsedA - elapsedB : elapsedB - elapsedA;
 };
 
-const saveUserState = (update = {}) => {
-  const { email } = STATE.user;
-  const data = JSON.parse(localStorage.getItem('vanhackevents') || '{}');
-  data[email] = Object.assign(data[email] || {}, update);
-  localStorage.setItem('vanhackevents', JSON.stringify(data));
-  STATE.user = data[email];
-};
-
 const isDuplicateApplication = (eventId) => new Promise((resolve) => {
-    queue.put(() => {
-      const { email } = STATE.user;
-      const data = JSON.parse(localStorage.getItem('vanhackevents') || '{}');
-      const userEvents = data[email].events || [];
-      resolve(userEvents.includes(eventId));
-    });
+  queue.put(() => {
+    const { email } = STATE.user;
+    const data = JSON.parse(localStorage.getItem('vanhackevents') || '{}');
+    const userEvents = data[email].events || [];
+    resolve(userEvents.includes(eventId));
   });
+});
 
 const applyToEvent = (eventId) => new Promise((resolve) => {
-    queue.put(() => {
-      let applied = false;
-      const event = STATE.events.find(({ id }) => id === eventId);
-      if (!event) return resolve(applied);
+  queue.put(() => {
+    let applied = false;
+    const event = STATE.events.find(({ id }) => id === eventId);
+    if (!event) return resolve(applied);
 
-      if (event.entry === 'Premium' && !STATE.user.isPremium) {
-        notify('You are not eligible. Activate <a href="#premium-info">premium</a> to apply');
-        return resolve(applied);
-      }
-
-      if (!STATE.user.events) STATE.user.events = [];
-
-      STATE.user.events.push(eventId);
-      saveUserState(STATE.user);
-      applied = true;
+    if (event.entry === 'Premium' && !STATE.user.isPremium) {
+      notify('You are not eligible. Activate <a href="#premium-info">premium</a> to apply');
       return resolve(applied);
-    });
+    }
+
+    if (!STATE.user.events) STATE.user.events = [];
+
+    STATE.user.events.push(eventId);
+    saveUserState(STATE.user);
+    applied = true;
+    return resolve(applied);
   });
+});
 
 const handleShareEvent = () => {
   const deepLink = `${window.location.href}`;
@@ -273,9 +130,6 @@ const handleApplyToEvent = async (eventId, btn) => {
       // the above button might be from within the modal
       // make sure the apply button on the event listing
       // is updated to reflect that the user has applied for the event
-
-      // const eventNode = [...selectAll(`[events] > div`)]
-      // .find((el) => el.dataset.uid === eventId);
       const eventNode = select(`[events] [uid=${eventId}]`);
       if (eventNode) {
         const relatedCTA = eventNode.querySelector('[apply-btn] [call-to-action]');
@@ -363,9 +217,8 @@ const lazyLoadEventBannersFor = (...selectors) => {
   }, []);
 
   banners.forEach((image) => {
-    const img = image;
-    const url = img.dataset.src;
-    loadBanner(url).then(() => displayBanner(img, url));
+    const url = image.dataset.src;
+    loadBanner(url).then(() => displayBanner(image, url));
   });
 };
 
@@ -392,44 +245,69 @@ const displayHeroEvents = async (promoted, theRest) => {
 
 const displayRemainingEvents = (events) => {
   rAF().then(() => {
-    displayEvents('[more-events-wrap] [events]', events.slice(0, 12));
+    displayEvents('[more-events-wrap] [events]', events);
   });
 };
 
 const handleRemainingEvents = async (events) => {
-  queue.put(() => {
-    const sorted = events.sort(sortEventsByStartDate('DSC'));
-    displayRemainingEvents(sorted);
-    sorted.forEach((evt) => STATE.events.push(evt));
-  });
+  const sortAndDisplayEvents = (payload) => {
+    payload.events = events.sort(sortEventsByStartDate('DSC'));
+    displayRemainingEvents(payload.events);
+    return payload;
+  };
+
+  const syncEvents = (payload) => {
+    STATE.events.push(...payload.events);
+    return payload;
+  };
+
+  queue.put(chain(sortAndDisplayEvents, syncEvents));
 };
 
-const moreEventsFetcher = new IntersectionObserver(async (entries) => {
-  const triggerView = entries.find((e) => e.isIntersecting === true);
-  if (triggerView) {
+const moreEventsFetcher = new IntersectionObserver((entries) => {
+  if (scheduledMoreEventsFetch === true) {
+    const triggerView = entries.find((e) => e.isIntersecting === true);
+    if (!triggerView) return;
+
+    scheduledMoreEventsFetch = false;
     moreEventsFetcher.unobserve(select('footer'));
     moreEventsFetcher.unobserve(select('[upcoming-events]'));
-    scheduledMoreEventsFetch = false;
 
-    const moreEvents = await fetchEvents();
-    await handleRemainingEvents(moreEvents);
+    fetchEvents().then((response) => {
+      const getEventsData = async (payload) => {
+        const { results: [{ events }] } = await response.json();
+        payload.events = events;
+        return payload;
+      };
+      const handleEventsData = (payload) => {
+        handleRemainingEvents(payload.events);
+        return payload;
+      };
+      queue.put(chain(getEventsData, handleEventsData));
+    });
   }
 });
 
 const handleHeroEvents = async (events) => {
-  queue.put(() => {
+  const sortAndDisplayEvents = (payload) => {
     const sorted = events.sort(sortEventsByStartDate('ASC'));
     const promoted = sorted.slice(0, 2);
     const theRest = sorted.slice(2, 8);
     displayHeroEvents(promoted, theRest);
+    payload.events = sorted;
+    return payload;
+  };
 
+  const syncEventsAndFethTheRest = (payload) => {
     if (!scheduledMoreEventsFetch) {
       moreEventsFetcher.observe(select('[upcoming-events]'));
       moreEventsFetcher.observe(select('footer'));
       scheduledMoreEventsFetch = true;
     }
-    STATE.events.push(...sorted);
-  });
+    STATE.events.push(...payload.events);
+    return payload;
+  };
+  queue.put(chain(sortAndDisplayEvents, syncEventsAndFethTheRest));
 };
 
 const signUserIn = () => {
@@ -463,8 +341,8 @@ const signUserIn = () => {
 
   queue.put(() => {
     const userEvents = STATE.user.events || [];
+    const applyCTA = [...selectAll('[apply-btn] [call-to-action]')];
     rAF().then(() => {
-      const applyCTA = [...selectAll('[apply-btn] [call-to-action]')];
       applyCTA.forEach((cta) => {
         const eventId = cta.closest('[data-uid]').dataset.uid;
         if (userEvents.includes(eventId)) {
@@ -507,13 +385,26 @@ const setupAuth = () => {
   loginBtn.addEventListener('click', signUserIn);
 };
 
-const startApp = async () => {
+const startApp = () => {
   setupUI();
   setupAuth();
   STATE.events = [];
 
-  const heroEvents = await fetchEvents('above-fold');
-  await handleHeroEvents(heroEvents);
+  fetchEvents('above-fold').then((response) => {
+    const getEventsData = async (payload) => {
+      const { results: [{ events }] } = await response.json();
+      payload.events = events;
+      return payload;
+    };
+
+    const handleEventsData = (payload) => {
+      handleHeroEvents(payload.events);
+      return payload;
+    };
+
+    queue.put(chain(getEventsData, handleEventsData));
+  });
+
   if (hasActiveRoute()) routeApp();
 };
 document.addEventListener('DOMContentLoaded', startApp);
