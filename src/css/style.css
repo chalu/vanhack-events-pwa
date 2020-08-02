@@ -138,6 +138,7 @@ nav[authenticated] [profile]:hover img {
 
 main [hero-image-wrap] {
   background: #e5f4ff;
+  min-height: 400px;
 }
 
 main [hero-text-wrap] h2 {
@@ -584,6 +585,11 @@ main [event-details-dialog] [title] {
     margin-bottom: 3em;
   }
 
+  main [hero-image-wrap] img {
+    width: 100%;
+    height: auto;
+  }
+
   main [hero-text-wrap] h2 {
     margin: 0 0.5em;
   }
@@ -627,6 +633,12 @@ main [event-details-dialog] [title] {
 @media only screen and (min-width: 481px) {
   main [hero-image-wrap] {
     margin-bottom: 3em;
+  }
+
+  main [hero-image-wrap] img {
+    width: 75%;
+    height: auto;
+    margin: 0 auto;
   }
 
   [testimonial] blockquote {
